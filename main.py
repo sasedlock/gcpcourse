@@ -1,7 +1,8 @@
 import functions_framework
+from flask import Request
 
 @functions_framework.http
-def hello_get(request):
+def hello_add(request: Request):
     """HTTP Cloud Function.
     Args:
         request (flask.Request): The request object.
@@ -15,4 +16,26 @@ def hello_get(request):
         Functions, see the `Writing HTTP functions` page.
         <https://cloud.google.com/functions/docs/writing/http#http_frameworks>
     """
-    return "Hello World!"
+    if not request.is_json:
+        return 0
+    
+    # Get the JSON data
+    data = request.get_json()
+    
+    # Check if the required fields exist
+    if 'num1' not in data or 'num2' not in data:
+        return 0
+    
+    # Extract the values
+    num1 = data.get('num1')
+    num2 = data.get('num2')
+
+    # Cast to integers
+    num1int = int(num1)
+    num2int = int(num2)
+
+    # Sum them up
+    if num1int is not None and num2int is not None:
+        return num1int + num2int
+    else:
+        return 0
