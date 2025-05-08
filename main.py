@@ -1,5 +1,6 @@
 import functions_framework
 from flask import Request
+from mathematics import add
 
 @functions_framework.http
 def hello_add(request: Request):
@@ -31,12 +32,6 @@ def hello_add(request: Request):
     num1 = data.get('num1')
     num2 = data.get('num2')
 
-    # Cast to integers
-    num1int = int(num1)
-    num2int = int(num2)
-
-    # Sum them up
-    if num1int is not None and num2int is not None:
-        return str(num1int + num2int)
-    else:
-        return result
+    # Add numbers together
+    result = str(add(num1, num2))
+    return result
