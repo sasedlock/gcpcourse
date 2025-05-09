@@ -1,6 +1,6 @@
 import functions_framework
 from flask import Request
-from mathematics import add
+from mathematics import add_array
 
 @functions_framework.http
 def hello_add(request: Request):
@@ -33,6 +33,10 @@ def hello_add(request: Request):
     num1 = data.get('num1')
     num2 = data.get('num2')
 
+    numbers = []
+    numbers.append(int(num1))
+    numbers.append(int(num2))
+
     # Add numbers together
-    result = str(add(num1, num2))
+    result = str(add_array(numbers))
     return result
