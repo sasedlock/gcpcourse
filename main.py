@@ -17,6 +17,7 @@ def hello_add(request: Request):
         Functions, see the `Writing HTTP functions` page.
         <https://cloud.google.com/functions/docs/writing/http#http_frameworks>
     """
+    # Set the default response
     result = "0"
     if not request.is_json:
         return result
