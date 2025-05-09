@@ -12,7 +12,7 @@ class TestMathematicsMethods(unittest.TestCase):
 
     # Passing an array of numbers as integers should return sum
     def test_add_array_of_integers(self):
-        self.assertEqual(mathematics.add_array([1,2],3))
+        self.assertEqual(mathematics.add_array([1,2]),3)
 
 if __name__ == '__main__':
     unittest.main()
