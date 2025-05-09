@@ -10,7 +10,4 @@ def add(num1, num2):
         return 0
     
 def add_array(numbers: list[int]) -> int:
-    sum = 0
-    for n in numbers:
-        sum += n
-    return sum
+    return sum(numbers)
