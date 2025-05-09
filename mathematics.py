@@ -1,4 +1,4 @@
-def add(num1, num2):
+def add(num1, num2) -> int:
     # Cast to integers
     num1int = int(num1)
     num2int = int(num2)
