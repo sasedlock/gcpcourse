@@ -1,0 +1,71 @@
+steps:
+  # Step 1: Install dependencies on the build agent - to validate requirements.txt is valid
+  - name: 'python:3.10.5' # This defines the Docker image/environment where the command will run.
+    id: 'validate-requirements' # This provides a unique identifier for this build step.
+    entrypoint: pip # This specifies the executable that will run instead of the default entry point of the container.
+    args: ['install', '-r', 'requirements.txt', '--user'] # These are the arguments passed to the command specified in "entrypoint".
+
+  # Step 2: Run unit tests on the build agent
+  - name: 'python:3.10.5'
+    id: 'run-unit-tests'
+    entrypoint: bash
+    args:
+      - '-c'
+      - |
+        pip install unittest-xml-reporting --user
+        python -m xmlrunner discover -s . -p "*_tests.py" -o /workspace/test-reports
+
+  # Step 3: Build the function package
+  - name: 'python:3.10.5'
+    id: 'build-package'
+    entrypoint: bash
+    args:
+      - '-c'
+      - |
+        # Create function package directory
+        mkdir -p /workspace/function-package
+        
+        # Copy Python files and requirements.txt
+        cp -r *.py /workspace/function-package/
+        cp -r requirements.txt /workspace/function-package/
+
+  # Step 4: Deploy to Cloud Run Functions
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-function'
+    entrypoint: gcloud
+    args:
+      - 'functions'
+      - 'deploy'
+      - '${_FUNCTION_NAME}'
+      - '--gen2'
+      - '--region=${_REGION}'
+      - '--runtime=python310'
+      - '--source=/workspace/function-package'
+      - '--trigger-http'
+      - '--allow-unauthenticated'
+      - '--entry-point=hello_add'
+      - '--memory=${_MEMORY}'
+      - '--timeout=${_TIMEOUT}'
+      - '--min-instances=${_MIN_INSTANCES}'
+      - '--max-instances=${_MAX_INSTANCES}'
+
+# Define the artifacts to keep
+artifacts:
+  objects:
+    location: 'gs://${_ARTIFACT_BUCKET}/'
+    paths: 
+      - 'function-package/**/*'
+      - 'test-reports/**/*.xml'
+
+# Substitution variables
+substitutions:
+  _FUNCTION_NAME: 'my_mathematics_function'    # Your Cloud Function name
+  _REGION: 'us-south1'                         # Your preferred region
+  _MEMORY: '256Mi'                             # Memory allocation
+  _TIMEOUT: '60s'                              # Function timeout
+  _MIN_INSTANCES: '0'                          # Minimum instances
+  _MAX_INSTANCES: '10'                         # Maximum instances
+  _ARTIFACT_BUCKET: 'my_mathematics_function_bucket'  # GCS bucket for artifacts
+
+# Timeout for the entire build process
+timeout: '1800s'  # 30 minutes
