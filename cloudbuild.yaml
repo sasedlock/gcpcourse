@@ -17,41 +17,38 @@ steps:
 
   # Step 3: Build the function package
   # TODO: Change to build a docker container
-  - name: 'python:3.10.5'
-    id: 'build-package'
-    entrypoint: bash
+  # TODO: Create Dockerfile
+  # TODO: Update BUILD_ID to be SHORT_SHA
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'containerize-application'
     args:
-      - '-c'
-      - |
-        # Create function package directory
-        mkdir -p /workspace/function-package
-        
-        # Copy Python files and requirements.txt
-        cp -r *.py /workspace/function-package/
-        cp -r requirements.txt /workspace/function-package/
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${BUILD_ID}'
+      - '.'
 
   # TODO: Insert step to push container to artifact registry
 
-  # Step 4: Deploy to Cloud Run Functions
-  # TODO: Update to point to container in artifact registry
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: 'deploy-function'
-    entrypoint: gcloud
-    args:
-      - 'functions'
-      - 'deploy'
-      - '${_FUNCTION_NAME}'
-      - '--gen2'
-      - '--region=${_REGION}'
-      - '--runtime=python310'
-      - '--source=/workspace/function-package'
-      - '--trigger-http'
-      - '--allow-unauthenticated'
-      - '--entry-point=hello_add'
-      - '--memory=${_MEMORY}'
-      - '--timeout=${_TIMEOUT}'
-      - '--min-instances=${_MIN_INSTANCES}'
-      - '--max-instances=${_MAX_INSTANCES}'
+  # Step 4: Deploy to Cloud Run
+  # TODO: Update to point to container in artifact registry and deploy to Cloud Run
+  # - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  #   id: 'deploy-function'
+  #   entrypoint: gcloud
+  #   args:
+  #     - 'functions'
+  #     - 'deploy'
+  #     - '${_FUNCTION_NAME}'
+  #     - '--gen2'
+  #     - '--region=${_REGION}'
+  #     - '--runtime=python310'
+  #     - '--source=/workspace/function-package'
+  #     - '--trigger-http'
+  #     - '--allow-unauthenticated'
+  #     - '--entry-point=hello_add'
+  #     - '--memory=${_MEMORY}'
+  #     - '--timeout=${_TIMEOUT}'
+  #     - '--min-instances=${_MIN_INSTANCES}'
+  #     - '--max-instances=${_MAX_INSTANCES}'
 
 # Define the artifacts to keep
 artifacts:
@@ -63,13 +60,15 @@ artifacts:
 
 # Substitution variables
 substitutions:
-  _FUNCTION_NAME: 'my_mathematics_function'    # Your Cloud Function name
+  #_FUNCTION_NAME: 'my_mathematics_function'    # Your Cloud Function name
+  _IMAGE_NAME: 'my_mathematics_function_image' # Image name prefix
   _REGION: 'us-south1'                         # Your preferred region
-  _MEMORY: '256Mi'                             # Memory allocation
-  _TIMEOUT: '60s'                              # Function timeout
-  _MIN_INSTANCES: '0'                          # Minimum instances
-  _MAX_INSTANCES: '10'                         # Maximum instances
-  _ARTIFACT_BUCKET: 'my_mathematics_function_bucket'  # GCS bucket for artifacts
+  #_MEMORY: '256Mi'                             # Memory allocation
+  #_TIMEOUT: '60s'                              # Function timeout
+  #_MIN_INSTANCES: '0'                          # Minimum instances
+  #_MAX_INSTANCES: '10'                         # Maximum instances
+  _ARTIFACT_BUCKET: 'my_mathematics_function_bucket'  # GCS bucket for other artifacts
+  _ARTIFACT_REGISTRY_REPO: 'my_mathematics_function_repo' # Artifact Registry repo for image artifacts
 
 # Timeout for the entire build process
 timeout: '1800s'  # 30 minutes
