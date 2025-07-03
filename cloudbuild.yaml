@@ -16,7 +16,7 @@ steps:
         python -m xmlrunner discover -s . -p "*_tests.py" -o /workspace/test-reports
 
   # Step 3: Build the function package
-  # TODO: Update BUILD_ID to be SHORT_SHA
+  # TODO: Update BUILD_ID to be SHORT_SHA once integration with GitHub is enabled
   - name: 'gcr.io/cloud-builders/docker'
     id: 'containerize-application'
     args:
@@ -25,9 +25,12 @@ steps:
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${BUILD_ID}'
       - '.'
 
-  # TODO: Insert step to push container to artifact registry
+  # Step 4: Upload app container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-container-image'
+    args: ['push', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${BUILD_ID}']
 
-  # Step 4: Deploy to Cloud Run
+  # Step 5: Deploy to Cloud Run
   # TODO: Update to point to container in artifact registry and deploy to Cloud Run
   # - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   #   id: 'deploy-function'
@@ -53,7 +56,6 @@ artifacts:
   objects:
     location: 'gs://${_ARTIFACT_BUCKET}/'
     paths: 
-      - 'function-package/**/*'
       - 'test-reports/**/*.xml'
 
 # Substitution variables
@@ -66,7 +68,7 @@ substitutions:
   #_MIN_INSTANCES: '0'                          # Minimum instances
   #_MAX_INSTANCES: '10'                         # Maximum instances
   _ARTIFACT_BUCKET: 'my_mathematics_function_bucket'  # GCS bucket for other artifacts
-  _ARTIFACT_REGISTRY_REPO: 'my_mathematics_function_repo' # Artifact Registry repo for image artifacts
+  _ARTIFACT_REGISTRY_REPO: 'my-mathematics-function-repo' # Artifact Registry repo for image artifacts
 
 # Timeout for the entire build process
 timeout: '1800s'  # 30 minutes
