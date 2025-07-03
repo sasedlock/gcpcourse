@@ -16,8 +16,6 @@ steps:
         python -m xmlrunner discover -s . -p "*_tests.py" -o /workspace/test-reports
 
   # Step 3: Build the function package
-  # TODO: Change to build a docker container
-  # TODO: Create Dockerfile
   # TODO: Update BUILD_ID to be SHORT_SHA
   - name: 'gcr.io/cloud-builders/docker'
     id: 'containerize-application'
