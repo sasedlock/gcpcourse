@@ -31,25 +31,10 @@ steps:
     args: ['push', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${BUILD_ID}']
 
   # Step 5: Deploy to Cloud Run
-  # TODO: Update to point to container in artifact registry and deploy to Cloud Run
-  # - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  #   id: 'deploy-function'
-  #   entrypoint: gcloud
-  #   args:
-  #     - 'functions'
-  #     - 'deploy'
-  #     - '${_FUNCTION_NAME}'
-  #     - '--gen2'
-  #     - '--region=${_REGION}'
-  #     - '--runtime=python310'
-  #     - '--source=/workspace/function-package'
-  #     - '--trigger-http'
-  #     - '--allow-unauthenticated'
-  #     - '--entry-point=hello_add'
-  #     - '--memory=${_MEMORY}'
-  #     - '--timeout=${_TIMEOUT}'
-  #     - '--min-instances=${_MIN_INSTANCES}'
-  #     - '--max-instances=${_MAX_INSTANCES}'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-function-to-cloud-run'
+    entrypoint: gcloud
+    args: ['run', 'deploy', '${_SERVICE_NAME}', '--image', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${BUILD_ID}', '--region', '${_REGION}']
 
 # Define the artifacts to keep
 artifacts:
@@ -60,6 +45,7 @@ artifacts:
 
 # Substitution variables
 substitutions:
+  _SERVICE_NAME: 'my-mathematics-function'     # Name of service
   _IMAGE_NAME: 'my_mathematics_function_image' # Image name prefix
   _REGION: 'us-south1'                         # Your preferred region
   _ARTIFACT_BUCKET: 'my_mathematics_function_bucket'  # GCS bucket for other artifacts
