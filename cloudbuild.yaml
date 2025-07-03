@@ -16,6 +16,7 @@ steps:
         python -m xmlrunner discover -s . -p "*_tests.py" -o /workspace/test-reports
 
   # Step 3: Build the function package
+  # TODO: Change to build a docker container
   - name: 'python:3.10.5'
     id: 'build-package'
     entrypoint: bash
@@ -29,7 +30,10 @@ steps:
         cp -r *.py /workspace/function-package/
         cp -r requirements.txt /workspace/function-package/
 
+  # TODO: Insert step to push container to artifact registry
+
   # Step 4: Deploy to Cloud Run Functions
+  # TODO: Update to point to container in artifact registry
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-function'
     entrypoint: gcloud
