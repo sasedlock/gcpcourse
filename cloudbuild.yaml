@@ -60,13 +60,8 @@ artifacts:
 
 # Substitution variables
 substitutions:
-  #_FUNCTION_NAME: 'my_mathematics_function'    # Your Cloud Function name
   _IMAGE_NAME: 'my_mathematics_function_image' # Image name prefix
   _REGION: 'us-south1'                         # Your preferred region
-  #_MEMORY: '256Mi'                             # Memory allocation
-  #_TIMEOUT: '60s'                              # Function timeout
-  #_MIN_INSTANCES: '0'                          # Minimum instances
-  #_MAX_INSTANCES: '10'                         # Maximum instances
   _ARTIFACT_BUCKET: 'my_mathematics_function_bucket'  # GCS bucket for other artifacts
   _ARTIFACT_REGISTRY_REPO: 'my-mathematics-function-repo' # Artifact Registry repo for image artifacts
 
