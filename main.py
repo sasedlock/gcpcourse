@@ -25,6 +25,7 @@ def hello_add(request: Request):
     # Get the JSON data
     data = request.get_json()
     
+    # TODO: Make this a more abstract method, able to take in an array of numbers.
     # Check if the required fields exist
     if 'num1' not in data or 'num2' not in data:
         return result
