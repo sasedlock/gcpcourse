@@ -16,25 +16,24 @@ steps:
         python -m xmlrunner discover -s . -p "*_tests.py" -o /workspace/test-reports
 
   # Step 3: Build the function package
-  # TODO: Update BUILD_ID to be SHORT_SHA once integration with GitHub is enabled
   - name: 'gcr.io/cloud-builders/docker'
     id: 'containerize-application'
     args:
       - 'build'
       - '-t'
-      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${BUILD_ID}'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${SHORT_SHA}'
       - '.'
 
   # Step 4: Upload app container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-container-image'
-    args: ['push', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${BUILD_ID}']
+    args: ['push', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${SHORT_SHA}']
 
   # Step 5: Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-function-to-cloud-run'
     entrypoint: gcloud
-    args: ['run', 'deploy', '${_SERVICE_NAME}', '--image', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${BUILD_ID}', '--region', '${_REGION}']
+    args: ['run', 'deploy', '${_SERVICE_NAME}', '--image', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${SHORT_SHA}', '--region', '${_REGION}']
 
 # Define the artifacts to keep
 artifacts:
